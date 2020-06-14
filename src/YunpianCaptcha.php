@@ -21,7 +21,7 @@ class YunpianCaptcha
 
     // 运行传递的参数
     protected array $allowed = [
-        'captchaId', 'token', 'authenticate', 'version', 'user', 'timestamp', 'secretId', 'nonce', 'signature'
+        'token', 'authenticate', 'version', 'user', 'timestamp', 'nonce', 'signature'
     ];
 
     protected array $params = [];
@@ -33,6 +33,21 @@ class YunpianCaptcha
         $this->secretKey = $secretKey;
         $this->secretId = $secretId;
         $this->captchaId = $captchaId;
+    }
+
+    public function checkRequest(array $request): bool
+    {
+        if (empty($request['token'] || empty($request['authenticate']))) {
+            return false;
+        }
+
+        $request['version'] = '1.0';
+        $request['timestamp'] = time();
+        $request['nonce'] = random_int(1, 99999);
+
+        $this->setParams($request);
+
+        return $this->check();
     }
 
     /**
@@ -66,13 +81,13 @@ class YunpianCaptcha
      *
      * @param $data
      *
-     * @return $this
      */
-    public function useParams(array $data)
+    public function setParams(array $data)
     {
         $this->params = array_intersect_key($data, array_flip($this->allowed));
-
-        return $this;
+        $this->setParam('secretId', $this->getSecretId());
+        $this->setParam('captchaId', $this->getCaptchaId());
+        $this->setSignature();
     }
 
     /**
@@ -126,10 +141,10 @@ class YunpianCaptcha
         $params = array_keys($this->params);
 
         if (!in_array('secretId', $params))
-            $this->setParams('secretId', $this->getSecretId());
+            $this->setParam('secretId', $this->getSecretId());
 
         if (!in_array('captchaId', $params))
-            $this->setParams('captchaId', $this->getCaptchaId());
+            $this->setParam('captchaId', $this->getCaptchaId());
 
         $signature = '';
         $params = $this->getParams();
@@ -145,7 +160,7 @@ class YunpianCaptcha
         $signature .= $this->getSecretKey();
         $signature = md5($signature);
 
-        $this->setParams('signature', $signature);
+        $this->setParam('signature', $signature);
 
         return $this;
     }
@@ -154,25 +169,28 @@ class YunpianCaptcha
      * 获取请求结果
      *
      * @return bool
-     * @throws InvalidArgumentException
      */
     public function check()
     {
         $data = array_filter($this->getParams());
 
-        $this->validParamsCheck();
+        try {
+            $this->validParamsCheck();
+        } catch (InvalidArgumentException $exception) {
+            return false;
+        }
 
         $response = $this->getHttpClient()->post($this->captchaUrl, [
             'form_params' => $data
         ]);
 
         if (200 != $response->getStatusCode()) {
-            throw new InvalidArgumentException($response->getBody()->getContents());
+            return false;
         }
 
-        $response = json_decode($response->getBody()->getContents());
+        $response = json_decode($response->getBody()->getContents(), true);
 
-        if (0 != $response['code']) {
+        if (0 !== $response['code']) {
             return false;
         }
 
@@ -187,7 +205,7 @@ class YunpianCaptcha
      *
      * @throws InvalidArgumentException
      */
-    public function getCheckResponse()
+    public function getCheckedResponseContent()
     {
         $this->validParamsCheck();
 
@@ -198,7 +216,7 @@ class YunpianCaptcha
 
     }
 
-    public function setParams(string $key, $val)
+    public function setParam(string $key, $val)
     {
         $this->params[$key] = $val;
     }

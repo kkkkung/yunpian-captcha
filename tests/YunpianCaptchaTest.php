@@ -4,7 +4,7 @@ namespace Uptutu\YunpianCaptcha\Tests;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
-use Uptutu\YunpianCaptcha\Exceptions\InvalidArgumentException;
+use Mockery\Mock;
 use Uptutu\YunpianCaptcha\YunpianCaptcha;
 use PHPUnit\Framework\TestCase;
 
@@ -46,7 +46,7 @@ class YunpianCaptchaTest extends TestCase
         $this->assertIsArray($y->getParams());
         $this->assertArrayNotHasKey('captchaId', $y->getParams());
 
-        $y->setParams('captchaId', 'xxxxx');
+        $y->setParam('captchaId', 'xxxxx');
         $this->assertArrayHasKey('captchaId', $y->getParams());
 
     }
@@ -55,9 +55,8 @@ class YunpianCaptchaTest extends TestCase
     {
         $y = new YunpianCaptcha('mock-id', 'mock-key', 'mock-captchaId');
 
+        $y->setParam('token', 'xxx');
         $this->assertIsArray($y->getParams());
-
-        $y->setParams('token', 'xxx');
         $this->assertArrayHasKey('token', $y->getParams());
     }
 
@@ -67,15 +66,14 @@ class YunpianCaptchaTest extends TestCase
 
         $data = [
             'token'        => 'mock-token',
-            'secretId'     => 'mock-secretId',
-            'captchaId'    => 'captchaId',
             'authenticate' => 'mock-authenticate',
             'version'      => '1.0',
             'timestamp'    => time(),
             'nonce'        => random_int(1, 99999)
         ];
 
-        $this->assertInstanceOf(YunpianCaptcha::class, $y->setParams($data)->setSignature());
+        $y->setParams($data);
+
         $this->assertArrayHasKey('signature', $y->getParams());
 
         if (!in_array('secretId', $data))
@@ -100,7 +98,7 @@ class YunpianCaptchaTest extends TestCase
     {
         $response = new Response(200, [], '{"code":1,"msg":"xxxx"}');
 
-        $apiRequest = \Mockery::mock(ApiRequest::class);
+        $apiRequest = \Mockery::mock(Client::class);
         $apiRequest->allows()->post('https://captcha.yunpian.com/v1/api/authenticate',
             [
                 'token'        => 'mock-tiken',
@@ -110,49 +108,26 @@ class YunpianCaptchaTest extends TestCase
                 'nonce'        => random_int(1, 99999)
             ], 'form_params')->andReturn($response);
 
-        $y = \Mockery::mock(YunpianCaptcha::class, ['mock-key', 'mock-id'])->makePartial();
-        $y->allows()->getRequest()->andrReturn($apiRequest);
+        $y = new YunpianCaptcha('mock-id', 'mock-key', 'mock-captchaId');
+        $response = $y->getCheckedResponseContent();
 
-        $this->assertSame(['code' => 1, 'msg' => 'xxx'], $y->getResult());
+        $this->assertSame(['code' => 1, 'msg' => 'xxx'], $response);
     }
 
-    public function TestGetResult()
-    {
-        $response = new Response(200, [], '{"code":1,"msg":"xxxx"}');
-
-        $apiRequest = \Mockery::mock(ApiRequest::class);
-        $apiRequest->allows()->post('https://captcha.yunpian.com/v1/api/authenticate',
-            [
-                'token'        => 'mock-tiken',
-                'authenticate' => 'mock-authenticate',
-                'version'      => '1.0',
-                'timestamp'    => time(),
-                'nonce'        => random_int(1, 99999)
-            ], 'form_params')->andReturn($response);
-
-        $y = \Mockery::mock(YunpianCaptcha::class, ['mock-key', 'mock-id'])->makePartial();
-        $y->allows()->getRequest()->andrReturn($apiRequest);
-
-        $this->assertIsBool($y->getResult());
-    }
-
-    public function testSetParamsWithInvalidData()
+    public function test_it_can_check_with_request_array()
     {
         $y = new YunpianCaptcha('mock-id', 'mock-key', 'mock-captchaId');
+        $request = ['token' => 'mock-token', 'authenticate' => 'mock-authenticate'];
 
-        $this->expectException(InvalidArgumentException::class);
+        $response = new Response(200, [], '{"code":0,"msg":"xxxx"}');
 
-        $data = 'test';
-        $y->setParams($data);
-        $this->expectExceptionMessage('数据[ ' . $data . ' ]不是一个能处理的数组');
+        $apiRequest = \Mockery::mock(Client::class);
+        $apiRequest->shouldReceive('post')->withAnyArgs()
+            ->andReturn($response);
 
-        $data = ['test' => 'test'];
-        $y->setParams($data);
-        $this->expectExceptionMessage('test 不是一个合法的传入参数');
+        $result = $y->useHttpClient($apiRequest)->checkRequest($request);
 
-        $this->fail('Failed to assert setParams throw exception with invalid argument');
-
-
+        $this->assertIsBool(true, $result);
     }
 
 }
