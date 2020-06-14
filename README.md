@@ -204,19 +204,25 @@ $y->setSignature();
 
 ### 获取结果
 
-该 SDK 有两个方式获取结果
+该 SDK 有两种检查方式
 
 1. ```php
-   $y->getResult();
+   $y->check();
    ```
 
 1. ```php
-   $y->getResultWithMsg();
+   $y->getCheckedResponseContent();
    ```
+   
+  1. ```php
+      $y->checkRequest($request);
+      ```
 
-第一种方式返回的是一个请求结果，布尔值，此次验证的成功与否，True 或者 False
+第一种方式返回的是一个请求结果，布尔值，此次验证的成功与否，True 或者 False, 但在调用前务必调用`setParams()` 方法将云片服务端需要的参数传入。
 
-第二种方式返回的是该次请求返回的数据，也就是文档中的code 和 msg
+第二种方式返回的是该次请求返回的数据，也就是文档中的 code 和 msg
+
+第三种是直接把前端用户行为验证成功后收到的 token  和 authenticate 用数组的形式传递 直接判断该次验证是否有效。
 
 #### 相应参数
 
