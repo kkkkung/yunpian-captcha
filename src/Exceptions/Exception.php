@@ -6,7 +6,7 @@
  * Time: 9:33 AM
  */
 
-namespace Yattao\YunpianCaptcha\Exceptions;
+namespace Uptutu\YunpianCaptcha\Exceptions;
 
 class Exception extends \Exception
 {

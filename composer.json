@@ -1,23 +1,22 @@
 {
-    "name": "yattao\/yunpian-captcha",
+    "name": "uptutu\/yunpian-captcha",
     "description": "Encapsulates the interface of the request Yunpian captcha",
     "license": "MIT",
     "authors": [
         {
-            "name": "AlexKung",
+            "name": "uptutu",
             "email": "alexkung@outlook.com"
         }
     ],
     "require": {
         "guzzlehttp/guzzle": "^6.3",
-        "yattao/api-request": "dev-master",
         "ext-json": "^1.7",
         "phpunit/phpunit": "^7.5",
         "mockery/mockery": "^1.2"
     },
     "autoload": {
         "psr-4": {
-            "Yattao\\YunpianCaptcha\\": "./src/"
+            "Uptutu\\YunpianCaptcha\\": "./src/"
         }
     }
 }

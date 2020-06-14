@@ -5,7 +5,7 @@
 ## 安装
 
 ```shell
-$ composer require yattao/yunpian-captcha -vvv
+$ composer require uptutu/yunpian-captcha -vvv
 ```
 
 ## 配置
@@ -135,7 +135,7 @@ Demo 中可以看见回调成功后会有两个重要的值，token 和 authenti
 ### 实例化 SDK
 
 ```php
-use Yattao\YunpianCaptcha\YunpianCaptcha;
+use Uptutu\YunpianCaptcha\YunpianCaptcha;
 
 $secretId = "xxxxxxxxxxx";
 $secretKey = "xxxxxxxxxx";
@@ -234,7 +234,7 @@ $y->setSignature();
 
 namespace Example;
 
-use Yattao\YunpianCaptcha\YunpianCaptcha;
+use Uptutu\YunpianCaptcha\YunpianCaptcha;
 
 $secretId = "xxxxxxxxxxx";
 $secretKey = "xxxxxxxxxx";
@@ -274,8 +274,8 @@ $result = $y->setParams($parmas)->setSignature()->getResultWithMsg();
 
 You can contribute in one of three ways:
 
-1. File bug reports using the [issue tracker](https://github.com/yattao/yunpianCaptcha/issues).
-2. Answer questions or fix bugs on the [issue tracker](https://github.com/yattao/yunpianCaptcha/issues).
+1. File bug reports using the [issue tracker](https://github.com/uptutu/yunpianCaptcha/issues).
+2. Answer questions or fix bugs on the [issue tracker](https://github.com/uptutu/yunpianCaptcha/issues).
 3. Contribute new features or update the wiki.
 
 _The code contribution process is not very formal. You just need to make sure that you follow the PSR-0, PSR-1, and PSR-2 coding guidelines. Any new code contributions must be accompanied by unit tests where applicable._

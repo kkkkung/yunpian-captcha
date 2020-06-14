@@ -1,14 +1,8 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Alex Kung
- * Date: 12/14/2018
- * Time: 5:41 PM
- */
 
 namespace Example;
 
-use Yattao\YunpianCaptcha\YunpianCaptcha;
+use Uptutu\YunpianCaptcha\YunpianCaptcha;
 
 $secretId = "xxxxxxxxxxx";
 $secretKey = "xxxxxxxxxx";
@@ -32,7 +26,7 @@ $y->setSignature();
 $result = $y->getResultWithMsg();
 var_dump($result);
 
-if ($y->getResult()){
+if ($y->check()){
     // Do Something
 } else {
     // Do Something else

@@ -1,11 +1,11 @@
 <?php
 
-namespace Yattao\YunpianCaptcha\Tests;
+namespace Uptutu\YunpianCaptcha\Tests;
 
+use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
-use Yattao\ApiRequest\ApiRequest;
-use Yattao\YunpianCaptcha\Exceptions\InvalidArgumentException;
-use Yattao\YunpianCaptcha\YunpianCaptcha;
+use Uptutu\YunpianCaptcha\Exceptions\InvalidArgumentException;
+use Uptutu\YunpianCaptcha\YunpianCaptcha;
 use PHPUnit\Framework\TestCase;
 
 class YunpianCaptchaTest extends TestCase
@@ -15,7 +15,7 @@ class YunpianCaptchaTest extends TestCase
     {
         $y = new YunpianCaptcha('mock-id', 'mock-key', 'mock-captchaId');
 
-        $this->assertInstanceOf(ApiRequest::class, $y->getRequest());
+        $this->assertInstanceOf(Client::class, $y->getHttpClient());
     }
 
     public function testGetSecretId()
@@ -29,7 +29,7 @@ class YunpianCaptchaTest extends TestCase
     {
         $y = new YunpianCaptcha('mock-id', 'mock-key', 'mock-captchaId');
 
-        $this->assertEquals('mock-key',$y->getSecretKey());
+        $this->assertEquals('mock-key', $y->getSecretKey());
     }
 
     public function testGetCaptchaId()
@@ -46,7 +46,7 @@ class YunpianCaptchaTest extends TestCase
         $this->assertIsArray($y->getParams());
         $this->assertArrayNotHasKey('captchaId', $y->getParams());
 
-        $y->setParams(['captchaId' => 'xxxxx']);
+        $y->setParams('captchaId', 'xxxxx');
         $this->assertArrayHasKey('captchaId', $y->getParams());
 
     }
@@ -57,7 +57,7 @@ class YunpianCaptchaTest extends TestCase
 
         $this->assertIsArray($y->getParams());
 
-        $y->setParams(['token' => 'xxx']);
+        $y->setParams('token', 'xxx');
         $this->assertArrayHasKey('token', $y->getParams());
     }
 
@@ -66,21 +66,21 @@ class YunpianCaptchaTest extends TestCase
         $y = new YunpianCaptcha('mock-id', 'mock-key', 'mock-captchaId');
 
         $data = [
-            'token' => 'mock-token',
-            'secretId' => 'mock-secretId',
-            'captchaId' => 'captchaId',
+            'token'        => 'mock-token',
+            'secretId'     => 'mock-secretId',
+            'captchaId'    => 'captchaId',
             'authenticate' => 'mock-authenticate',
-            'version' => '1.0',
-            'timestamp' => time(),
-            'nonce' => random_int(1, 99999)
+            'version'      => '1.0',
+            'timestamp'    => time(),
+            'nonce'        => random_int(1, 99999)
         ];
 
         $this->assertInstanceOf(YunpianCaptcha::class, $y->setParams($data)->setSignature());
         $this->assertArrayHasKey('signature', $y->getParams());
 
-        if (!in_array('secretId',$data))
+        if (!in_array('secretId', $data))
             $data['secretId'] = $y->getSecretId();
-        if (!in_array('captchaId',$data))
+        if (!in_array('captchaId', $data))
             $data['captchaId'] = $y->getCaptchaId();
 
         $str = '';
@@ -103,11 +103,11 @@ class YunpianCaptchaTest extends TestCase
         $apiRequest = \Mockery::mock(ApiRequest::class);
         $apiRequest->allows()->post('https://captcha.yunpian.com/v1/api/authenticate',
             [
-                'token' => 'mock-tiken',
+                'token'        => 'mock-tiken',
                 'authenticate' => 'mock-authenticate',
-                'version' => '1.0',
-                'timestamp' => time(),
-                'nonce' => random_int(1, 99999)
+                'version'      => '1.0',
+                'timestamp'    => time(),
+                'nonce'        => random_int(1, 99999)
             ], 'form_params')->andReturn($response);
 
         $y = \Mockery::mock(YunpianCaptcha::class, ['mock-key', 'mock-id'])->makePartial();
@@ -123,11 +123,11 @@ class YunpianCaptchaTest extends TestCase
         $apiRequest = \Mockery::mock(ApiRequest::class);
         $apiRequest->allows()->post('https://captcha.yunpian.com/v1/api/authenticate',
             [
-                'token' => 'mock-tiken',
+                'token'        => 'mock-tiken',
                 'authenticate' => 'mock-authenticate',
-                'version' => '1.0',
-                'timestamp' => time(),
-                'nonce' => random_int(1, 99999)
+                'version'      => '1.0',
+                'timestamp'    => time(),
+                'nonce'        => random_int(1, 99999)
             ], 'form_params')->andReturn($response);
 
         $y = \Mockery::mock(YunpianCaptcha::class, ['mock-key', 'mock-id'])->makePartial();

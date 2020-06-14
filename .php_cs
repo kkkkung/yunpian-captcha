@@ -1,6 +1,6 @@
 <?php
 $header = <<<EOF
-This file is part of the yattao/yunpianCaptcha.
+This file is part of the uptutu/yunpianCaptcha.
 
 (c) AlexKung <alexkung@outlook.com>
 

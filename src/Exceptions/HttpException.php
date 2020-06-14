@@ -6,7 +6,7 @@
  * Time: 5:22 PM
  */
 
-namespace Yattao\YunpianCaptcha\Exceptions;
+namespace Uptutu\YunpianCaptcha\Exceptions;
 
 class HttpException extends Exception
 {

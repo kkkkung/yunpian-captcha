@@ -6,7 +6,7 @@
  * Time: 9:35 AM
  */
 
-namespace Yattao\YunpianCaptcha\Exceptions;
+namespace Uptutu\YunpianCaptcha\Exceptions;
 
 class InvalidArgumentException extends Exception
 {
